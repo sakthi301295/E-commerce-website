@@ -1,75 +1,93 @@
-import React from "react";
+import React, { useContext } from "react";
 import "./CartItems.css";
-import { useContext } from "react";
 import { ShopContext } from "../Context/ShopContext";
-import remove_icon from "../Asset/cart_cross_icon.png";
+import { Link } from "react-router-dom";
 
-export const CartItems = () => {
-  const { getTotalCartAmount,all_product, cartItems, RemoveFromCart } =
-    useContext(ShopContext);
+const CartItems = () => {
+  const {
+    cartItems,
+    all_product,
+    addToCart,
+    removeFromCart,
+    deleteFromCart,
+    getTotalCartAmount,
+  } = useContext(ShopContext);
+
   return (
-    <div className="cartitems">
-      <div className="cartitems-format-main">
-        <p>Product</p>
-        <p>Title</p>
-        <p>Price</p>
-        <p>Quantity</p>
-        <p>Total</p>
-        <p>Remove</p>
-      </div>
-      <hr />
-      {all_product.map((e) => {
-        if(cartItems[e.id] > 0) {
-          return (
-            <div>
-              <div className="cartitems-format cartitems-format-main">
-                <img src={e.image} alt="" className="cartitems-product-icon" />
-                <p>{e.name}</p>
-                <p>${e.new_price}</p>
-                <button className="cartitems-quantity">
-                  {cartItems[e.id]}
-                </button>
-                <p>${e.new_price * cartItems[e.id]}</p>
-                <img className="cartitems-remove-icon"
-                  src={remove_icon}
-                  onClick={() => RemoveFromCart(e.id)}
-                  alt=""
+    <div className="cart-container">
+      <h2 className="cart-title">Shopping Cart</h2>
+
+      <div className="cart-list">
+        {all_product
+          .filter((p) => cartItems[p.id] > 0)
+          .map((product) => (
+            <div className="cart-item" key={product.id}>
+              <div className="cart-item-img-wrapper">
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="cart-item-img"
                 />
               </div>
+              <div className="cart-item-details">
+                <Link to={`/product/${product.id}`} className="cart-item-name">
+                  {product.name}
+                </Link>
+
+                <p className="cart-item-category">
+                  Category: {product.category}
+                </p>
+
+                <p className="cart-item-price">
+                  <span className="old">${product.old_price}</span>
+                  <span className="new">${product.new_price}</span>
+                </p>
+                <div className="qty-dropdown">
+                  Qty:{" "}
+                  <select
+                    value={cartItems[product.id]}
+                    onChange={(e) => {
+                      const value = Number(e.target.value);
+                      if (value > cartItems[product.id]) {
+                        addToCart(product.id);
+                      } else {
+                        removeFromCart(product.id);
+                      }
+                    }}
+                  >
+                    {[...Array(10).keys()].map((i) => (
+                      <option key={i + 1} value={i + 1}>
+                        {i + 1}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <p className="cart-item-total">
+                  Total: ${product.new_price * cartItems[product.id]}
+                </p>
+
+                <button
+                  className="remove-btn"
+                  onClick={() => deleteFromCart(product.id)}
+                >
+                  Remove
+                </button>
+              </div>
             </div>
-          );
-        }
-        return null;
-      })}
-      <div className="carditems-down">
-        <div className="carditems-total">
-            <h1>Cart Total</h1>
-            <div>
-                <div className="cartitem-total-item">
-                    <p>Subtotal</p>
-                    <p>${getTotalCartAmount()}</p>
-                </div>
-                <hr />
-                <div className="cartitem-total-item">
-                    <p>Shipping</p>
-                    <p>Free</p>
-                </div>
-                <hr />
-                <div className="cartitem-total-item">
-                    <h3>Total</h3>
-                    <h3>${getTotalCartAmount()}</h3>
-                </div>
-            </div>
-            <button>Checkout</button>
+          ))}
+      </div>
+      <div className="cart-summary">
+        <h3>Order Summary</h3>
+        <div className="summary-row">
+          <span>Total:</span>
+          <span>${getTotalCartAmount()}</span>
         </div>
-        <div className="cartitems-promocode">
-            <p>If you have a promocode, please enter it here</p>
-            <div className="cartitems-promobox">
-                <input type="text" placeholder="Promo Code" />
-                <button>Submit</button>
-            </div>
-        </div>
+
+        <button className="checkout-btn">Proceed to Checkout</button>
       </div>
     </div>
   );
 };
+
+export default CartItems;

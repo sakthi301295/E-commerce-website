@@ -1,25 +1,39 @@
-import React from 'react'
-import './CSS/Loginsignup.css'
+import React from "react";
+import "./CSS/Loginsignup.css";
 
 export const Loginsignup = () => {
   return (
-    <div className='loginsignup'>
-      <div className="loginsignup-container">
-        <h1>sign up</h1>
-        <div className="loginsignup-fields">
-          <input type="text" placeholder='Your Name' />
-          <input type="email" placeholder='Email Address'/>
-          <input type="passoword" placeholder='Password' />
-        </div>
-        <button>Continue</button>
-        <p className="loginsignup-login">Already have an account?<span>Login here</span></p>
-        <div className="loginsignup-agree">
-          <input type="checkbox" name='' id='' />
-          <p>By continuing, i agree to the terms of Use and Privacy Policy.</p>
-        </div>
-    
-      </div>
+    <div className="login-wrapper">
+      <div className="login-card slide-in">
+        <h1>Create Account</h1>
 
+        <div className="input-group">
+          <input type="text" required />
+          <label>Your Name</label>
+        </div>
+
+        <div className="input-group">
+          <input type="email" required />
+          <label>Email Address</label>
+        </div>
+
+        <div className="input-group">
+          <input type="password" required />
+          <label>Password</label>
+        </div>
+
+        <button className="animated-btn">Continue</button>
+
+        <p className="login-text">
+          Already have an account?
+          <span className="login-link"> Login here</span>
+        </p>
+
+        <div className="agree-section">
+          <input type="checkbox" />
+          <p>By continuing, you agree to the Terms & Privacy Policy.</p>
+        </div>
+      </div>
     </div>
-  )
-}
+  );
+};

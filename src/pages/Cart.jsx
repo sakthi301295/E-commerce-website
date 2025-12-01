@@ -1,5 +1,7 @@
 import React from 'react'
-import { CartItems } from '../components/CardItems/CartItems'
+import CartItems from "../components/CardItems/CartItems";
+
+
 
 export const Cart = () => {
   return (

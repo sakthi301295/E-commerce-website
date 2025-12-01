@@ -1,63 +1,67 @@
-import React from "react";
-import { createContext } from "react";
+import React, { createContext, useEffect, useReducer, useState } from "react";
 import all_product from "../Asset/all_product";
 
-export const ShopContext = createContext(null);
-const getDefaultCart = () => {
-  let cart = {};
-  for (let i = 1; i < all_product.length + 1; i++) {
-    cart[i] = 0;
-  }
-  return cart;
+export const ShopContext = createContext();
+const initialCart = () => {
+  const saved = localStorage.getItem("cart");
+  if (saved) return JSON.parse(saved);
+  return all_product.reduce((acc, p) => {
+    acc[p.id] = 0;
+    return acc;
+  }, {});
 };
-const ShopContextprovider = (props) => {
-  const [cartItems, setCartItems] = React.useState(getDefaultCart());
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "ADD":
+      return { ...state, [action.id]: state[action.id] + 1 };
 
-  const addToCart = (itemId) => {
-    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
-    console.log(cartItems);
-  };
-  const RemoveFromCart = (itemId) => {
-    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
-  };
+    case "REMOVE":
+      return { ...state, [action.id]: Math.max(0, state[action.id] - 1) };
 
-  const getTotalCartAmount = () => {
-    let totalAmount = 0;
-    for (const item in cartItems) {
-      if (cartItems[item] > 0) {
-        let itemInfo = all_product.find(
-          (product) => product.id === Number(item)
-        );
-        totalAmount += itemInfo.new_price * cartItems[item];
-      }
-    }
-    return totalAmount;
-  };
+    case "DELETE":
+      return { ...state, [action.id]: 0 };
 
-  const getTotalCartItems = () => {
-    let totalCount = 0;
-    for (const item in cartItems) {
-      if (cartItems[item] > 0) {
-        totalCount += cartItems[item];
-      }
-    }
-    return totalCount;
-  };
-
-  const contextValue = {
-    getTotalCartAmount,
-     getTotalCartItems,
-    all_product,
-    cartItems,
-    addToCart,
-    RemoveFromCart,
-  };
+    default:
+      return state;
+  }
+};
+const ShopContextProvider = ({ children }) => {
+  const [cartItems, dispatch] = useReducer(reducer, {}, initialCart);
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchResults = all_product.filter((item) =>
+    item.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cartItems));
+  }, [cartItems]);
+  const addToCart = (id) => dispatch({ type: "ADD", id });
+  const removeFromCart = (id) => dispatch({ type: "REMOVE", id });
+  const deleteFromCart = (id) => dispatch({ type: "DELETE", id });
+  const getTotalCartAmount = () =>
+    all_product.reduce((acc, item) => {
+      return acc + item.new_price * (cartItems[item.id] || 0);
+    }, 0);
+  const getTotalCartItems = () =>
+    Object.values(cartItems).reduce((a, b) => a + b, 0);
 
   return (
-    <ShopContext.Provider value={contextValue}>
-      {props.children}
+    <ShopContext.Provider
+      value={{
+        all_product,
+        cartItems,
+        addToCart,
+        removeFromCart,
+        deleteFromCart,
+        getTotalCartAmount,
+        getTotalCartItems,
+        searchQuery,
+        setSearchQuery,
+        searchResults,
+      }}
+    >
+      {children}
     </ShopContext.Provider>
   );
 };
 
-export default ShopContextprovider;
+export default ShopContextProvider;

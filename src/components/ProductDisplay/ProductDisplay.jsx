@@ -1,14 +1,23 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import "./ProductDisplay.css";
 import star_icon from "../Asset/star_icon.png";
 import star_dull_icon from "../Asset/star_dull_icon.png";
-import { useContext } from "react";
 import { ShopContext } from "../Context/ShopContext";
 
-export const ProductDisplay = (props) => {
-  const { product } = props;
+export const ProductDisplay = ({ product }) => {
+  const { addToCart } = useContext(ShopContext);
 
-  const {addToCart} = useContext(ShopContext);
+  const [selectedSize, setSelectedSize] = useState(null);
+
+  const sizes = ["S", "M", "L", "XL", "XXL"];
+
+  const handleAddToCart = () => {
+    if (!selectedSize) {
+      alert("Please select a size before adding to cart.");
+      return;
+    }
+    addToCart(product.id, selectedSize);
+  };
 
   return (
     <div className="productdisplay">
@@ -25,7 +34,6 @@ export const ProductDisplay = (props) => {
         </div>
       </div>
 
-      {/* FIX: Everything must be inside this container */}
       <div className="productdisplay-right">
         <h1>{product.name}</h1>
 
@@ -48,24 +56,28 @@ export const ProductDisplay = (props) => {
         </div>
 
         <div className="productdisplay-right-discription">
-          The most significant restriction in online fashion and apparel shopping
-          is the customer’s integration with the clothes they purchase. It’s
-          crucial to demonstrate the limitless potential of your garments in
-          terms of the emotions they evoke.
+          The most significant restriction in online fashion and apparel
+          shopping is the customer’s integration with the clothes they purchase.
         </div>
 
         <div className="productdisplay-right-size">
           <h1>Select Size</h1>
           <div className="productdisplay-right-sizes">
-            <div>S</div>
-            <div>M</div>
-            <div>L</div>
-            <div>XL</div>
-            <div>XXL</div>
+            {sizes.map((size) => (
+              <div
+                key={size}
+                className={`size-box ${
+                  selectedSize === size ? "active-size" : ""
+                }`}
+                onClick={() => setSelectedSize(size)}
+              >
+                {size}
+              </div>
+            ))}
           </div>
         </div>
 
-        <button onClick={() => addToCart(product.id)}>Add To Cart</button>
+        <button onClick={handleAddToCart}>Add To Cart</button>
 
         <p className="productdisplay-right-category">
           <span>Category : </span>Women, T-shirt, Crop Top
