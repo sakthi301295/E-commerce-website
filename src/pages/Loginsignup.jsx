@@ -22,7 +22,7 @@ export const Loginsignup = () => {
           <label>Password</label>
         </div>
 
-        <button className="animated-btn">Continue</button>
+        <button className="animated-btn" >Continue</button>
 
         <p className="login-text">
           Already have an account?

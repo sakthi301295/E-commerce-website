@@ -1,42 +1,82 @@
-import React from "react";
+import React, { useState } from "react";
+import "./CSS/Shop.css";
+import FiltersSidebar from "../components/Filters/FiltersSidebar";
+import ProductGrid from "../components/Products/ProductGrid";
 import Hero from "../components/Hero/Hero";
 import Popular from "../components/popular/Popular";
 import { Offer } from "../components/Offers/Offers";
 import NewCollections from "../components/NewCollections/NewCollections";
 import { NewsLetter } from "../components/NewsLetter/NewsLetter";
-import "./CSS/Shop.css";
+import FilterChips from "../components/Filters/FilterChips";
+
 
 export const Shop = () => {
+
+  const [filters, setFilters] = useState({
+    categories: [],
+    brands: [],
+    price: 5000,
+    rating: 0,
+    freeDelivery: false,
+    offer: false,
+  });
+
+  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+  const [sortType, setSortType] = useState("");
+
+  const filtersActive =
+    filters.categories.length > 0 ||
+    filters.brands.length > 0 ||
+    filters.price < 5000 ||
+    filters.rating > 0 ||
+    filters.freeDelivery ||
+    filters.offer;
+
   return (
-    <div>
-      <div className="shop-filters">
-        <select>
-          <option value="">Sort by</option>
-          <option value="low">Price: Low to High</option>
-          <option value="high">Price: High to Low</option>
-          <option value="new">Newest Arrivals</option>
-        </select>
+    <div className="shop-container">
 
-        <select>
-          <option value="">Category</option>
-          <option value="men">Men</option>
-          <option value="women">Women</option>
-          <option value="kids">Kids</option>
-        </select>
+      <button className="mobile-filter-btn" onClick={() => setMobileFilterOpen(true)}>
+        ☰ Filters
+      </button>
 
-        <select>
-          <option value="">Brand</option>
-          <option value="nike">Nike</option>
-          <option value="adidas">Adidas</option>
-          <option value="puma">Puma</option>
-        </select>
+      <FiltersSidebar
+        filters={filters}
+        setFilters={setFilters}
+        mobileFilterOpen={mobileFilterOpen}
+        setMobileFilterOpen={setMobileFilterOpen}
+      />
+
+      <div className="shop-content">
+
+        <Hero />
+
+       {filtersActive && (
+  <div className="shop-products-area">
+
+    <FilterChips filters={filters} setFilters={setFilters} />
+
+    <div className="sorting-bar">
+      <select value={sortType} onChange={(e) => setSortType(e.target.value)}>
+        <option value="">Sort by</option>
+        <option value="low-high">Price: Low to High</option>
+        <option value="high-low">Price: High to Low</option>
+        <option value="rating">Customer Rating</option>
+        <option value="newest">Newest Arrivals</option>
+      </select>
+    </div>
+
+    <ProductGrid filters={filters} sortType={sortType} />
+  </div>
+)}
+
+        <Popular />
+        <Offer />
+        <NewCollections />
+        <NewsLetter />
+
       </div>
-      <Hero />
-      <Popular />
-      <Offer />
-      <NewCollections />
-      <NewsLetter />
     </div>
   );
 };
+
 export default Shop;
